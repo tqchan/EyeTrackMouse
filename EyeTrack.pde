@@ -1,7 +1,5 @@
-// import org.jorgecardoso.processing.eyetribe.*;
-// import com.theeyetribe.client.data.*;
+import ddf.minim.*;  //minimライブラリのインポート
 
-// EyeTribe eyeTribe;
 float grid[][];
 PVector point;
 PImage img,birdImage;
@@ -24,6 +22,9 @@ float t2;  //アニメーション用経過時間（X座標）
 float rad = (TWO_PI/60.0)/3;//1秒で1回転するように30で割る。度数法だと12°,更に3で割ると1周期3秒
 float w_r = 0.0;
 float myScale = 100.0;  //画面上で見やすいように拡大
+Minim minim;  //Minim型変数であるminimの宣言
+AudioPlayer player;  //サウンドデータ格納用の変数
+AudioPlayer player2;
 
 void setup() {
   fullScreen();
@@ -36,19 +37,19 @@ void setup() {
   //日本語を表示するためにフォントを指定
   font = createFont("Yu Gothic",48,true);
   textFont(font);
-  // smooth();
-  // point = new PVector();
-  // eyeTribe = new EyeTribe(this);
   for (int i = 0; i < bird.length; i++) {
     bird[i] = new Bird();
     bird[i].setup();
   }
   a = width;
   w_r = width / rad;
+  minim = new Minim(this);  //初期化
+  player = minim.loadFile("bgm.mp3");  //mp3をロードする
+  player.play();  //再生
+  player2 = minim.loadFile("atari.mp3");
 }
 
 void draw() {
-  // background(0);
   image(pg, 0, 0);
   noStroke();
   Mouse(mouseX,mouseY);
@@ -59,7 +60,7 @@ void draw() {
     }
   } else {
     bird[0].draw();
-    // bird[0].collision();
+    bird[0].collision();
   }
   
   textSize(30);
@@ -83,19 +84,6 @@ void keyPressed(){
 void mousePressed(){
   i++;
 }
-
-// void onGazeUpdate(PVector gaze, PVector leftEye_, PVector rightEye_, GazeData data) {
-//   if ( gaze != null ) {
-//     point = gaze.get();
-//     int x = (int)constrain(round(map(point.x, 0, width, 0, COLS-1)), 0, COLS-1);
-//     int y = (int)constrain(round(map(point.y, 0, height, 0, ROWS-1)), 0, ROWS-1);
-//     grid[y][x] = constrain( grid[y][x]+10, 0, 255);
-//   }
-// }
-
-// void trackerStateChanged(String state) {
-//   println("Tracker state: " + state);
-// }
 
 
 class Bird {
@@ -157,25 +145,16 @@ class Bird {
         birdY = (int)random(0, height);
         birdX = width;
       }
+      player2.play();
+      player2.rewind();  //再生が終わったら巻き戻しておく
       collisionNum ++;
     }
   }
 
   void sinMove(){
     if ((_sinMove % 2) == 1 ) {
-      // a += moveSpeed;
-      // float x = a * (2*PI/width);
-      // float y = sin(x);
-      // int posY= (int)((-y+2)*(height/4));
-      // ellipse(x, posY, 5, 5);
-      // birdX = (int)x;
-      // birdY = (int)posY;
-      // if (birdX <= 0) {
-      //     a = width;
-      //   }
       x = t2*myScale;
       y = -A*sin(w*t2 + p2);
-      // ellipse(x, y + height/2, 10, 10);
       t2 += rad;    //時間を進める
       birdX = (int)x;
       birdY = (int)y + height / 2;
@@ -183,7 +162,6 @@ class Bird {
       if (t2 > gamen) {
         t2 = 0.0;//画面の端に行ったら原点に戻る
       }
-      text(t2, 10, 20);
     } else {
       t2 = 0.0;
     }
