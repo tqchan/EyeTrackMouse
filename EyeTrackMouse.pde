@@ -6,7 +6,7 @@ PImage img,birdImage;
 Bird[] bird = new Bird[10];
 int R,G,B = 0;
 int frame = 60;
-PGraphics pg,birdPg;
+PGraphics pg,birdPg,mousePg;
 int i = 0;
 int _sinMove = 0;
 int moveSpeed = 10;
@@ -34,7 +34,7 @@ void setup() {
   pg.beginDraw();
   pg.image(img,0, 0, width, height);
   pg.endDraw();
-  //日本語を表示するためにフォントを指定
+    //日本語を表示するためにフォントを指定
   font = createFont("Yu Gothic",48,true);
   textFont(font);
   for (int i = 0; i < bird.length; i++) {
@@ -43,6 +43,12 @@ void setup() {
   }
   a = width;
   w_r = width / rad;
+  //mouseに鳥の画像
+  mousePg = createGraphics(width, height);
+  mousePg.beginDraw();
+  mousePg.image(birdImage, 0, 0);
+  mousePg.endDraw();
+  //音楽
   minim = new Minim(this);  //初期化
   player = minim.loadFile("bgm.mp3");  //mp3をロードする
   player.play();  //再生
@@ -68,8 +74,11 @@ void draw() {
 }
 
 void Mouse(float mX, float mY){
-  fill(R,G,B,255);
-  ellipse(mX, mY, 10, 10);
+  // fill(R,G,B,255);
+  float ix = mX - (birdImage.width / 2);
+  float iy = mY - (birdImage.height / 2);
+  image(mousePg, ix, iy);
+  // ellipse(mX, mY, 10, 10);
 }
 
 void keyPressed(){
