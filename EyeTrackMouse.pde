@@ -25,6 +25,9 @@ float myScale = 100.0;  //画面上で見やすいように拡大
 Minim minim;  //Minim型変数であるminimの宣言
 AudioPlayer player;  //サウンドデータ格納用の変数
 AudioPlayer player2;
+PrintWriter output; //ファイル書き出し
+String mode; //モード格納
+int _bx, _by;
 
 void setup() {
   fullScreen();
@@ -53,12 +56,17 @@ void setup() {
   player = minim.loadFile("bgm.mp3");  //mp3をロードする
   player.play();  //再生
   player2 = minim.loadFile("atari.mp3");
+  String filename = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2);
+  // 新しいファイルを生成
+  output = createWriter( filename + ".csv");
+  output.println("unixtime,mouseX,mouseY,collision,mode");
 }
 
 void draw() {
   image(pg, 0, 0);
   noStroke();
   Mouse(mouseX,mouseY);
+  String outTime = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2) + millis();
   if ((_sinMove % 2) == 0) {
     for (int i = 0; i < bird.length; i++) {
       bird[i].draw();
@@ -68,9 +76,15 @@ void draw() {
     bird[0].draw();
     bird[0].collision();
   }
-  
   textSize(30);
   text("得点：" + collisionNum, 10, 30);
+  if ((_sinMove % 2) == 1) {
+    mode = "sin_mode" + "," + _bx + "," + _by;
+  } else {
+    mode = "mode" + (i % 2);
+  }
+  
+  output.println(outTime + "," + mouseX + "," + mouseY + "," + collisionNum + "," + mode);
 }
 
 void Mouse(float mX, float mY){
@@ -137,7 +151,8 @@ class Bird {
         }
       }
     }
-    
+    _bx = birdX;
+    _by = birdY;
   }
 
   void collision(){
@@ -146,17 +161,19 @@ class Bird {
     bY = birdY;
     mX = mouseX;
     mY = mouseY;
-    if (bX <= mX && mX <= bX + birdImage.width && bY <= mY && mY <= bY + birdImage.height){
-      if (i % 2 == 0) {
-        birdX = (int)random(0, width);
-        birdY = 0;
-      } else {
-        birdY = (int)random(0, height);
-        birdX = width;
+    if ((_sinMove % 2) == 0) {
+      if (bX <= mX && mX <= bX + birdImage.width && bY <= mY && mY <= bY + birdImage.height){
+        if (i % 2 == 0) {
+          birdX = (int)random(0, width);
+          birdY = 0;
+        } else {
+          birdY = (int)random(0, height);
+          birdX = width;
+        }
+        player2.play();
+        player2.rewind();  //再生が終わったら巻き戻しておく
+        collisionNum ++;
       }
-      player2.play();
-      player2.rewind();  //再生が終わったら巻き戻しておく
-      collisionNum ++;
     }
   }
 
@@ -164,12 +181,14 @@ class Bird {
     if ((_sinMove % 2) == 1 ) {
       x = t2*myScale;
       y = -A*sin(w*t2 + p2);
-      t2 += rad;    //時間を進める
       birdX = (int)x;
       birdY = (int)y + height / 2;
       float gamen = width/4 * rad;
       if (t2 > gamen) {
         t2 = 0.0;//画面の端に行ったら原点に戻る
+      }
+      if (birdX <= mouseX && mouseX <= (birdX + birdImage.width) && birdY <= mouseY && mouseY <= (birdY + birdImage.height)) {
+        t2 += rad;    //時間を進める
       }
     } else {
       t2 = 0.0;

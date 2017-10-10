@@ -66,6 +66,9 @@ float myScale = 100.0f;  //\u753b\u9762\u4e0a\u3067\u898b\u3084\u3059\u3044\u308
 Minim minim;  //Minim\u578b\u5909\u6570\u3067\u3042\u308bminim\u306e\u5ba3\u8a00
 AudioPlayer player;  //\u30b5\u30a6\u30f3\u30c9\u30c7\u30fc\u30bf\u683c\u7d0d\u7528\u306e\u5909\u6570
 AudioPlayer player2;
+PrintWriter output; //\u30d5\u30a1\u30a4\u30eb\u66f8\u304d\u51fa\u3057
+String mode; //\u30e2\u30fc\u30c9\u683c\u7d0d
+int _bx, _by;
 
 public void setup() {
   
@@ -94,12 +97,17 @@ public void setup() {
   player = minim.loadFile("bgm.mp3");  //mp3\u3092\u30ed\u30fc\u30c9\u3059\u308b
   player.play();  //\u518d\u751f
   player2 = minim.loadFile("atari.mp3");
+  String filename = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2);
+  // \u65b0\u3057\u3044\u30d5\u30a1\u30a4\u30eb\u3092\u751f\u6210
+  output = createWriter( filename + ".csv");
+  output.println("unixtime,mouseX,mouseY,collision,mode");
 }
 
 public void draw() {
   image(pg, 0, 0);
   noStroke();
   Mouse(mouseX,mouseY);
+  String outTime = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2) + millis();
   if ((_sinMove % 2) == 0) {
     for (int i = 0; i < bird.length; i++) {
       bird[i].draw();
@@ -109,9 +117,17 @@ public void draw() {
     bird[0].draw();
     bird[0].collision();
   }
-  
   textSize(30);
   text("\u5f97\u70b9\uff1a" + collisionNum, 10, 30);
+  if ((_sinMove % 2) == 1) {
+    // Bird birdXY = new Bird();
+    // float bf = birdXY.point(mouseX, mouseY);
+    mode = "sin_mode" + "," + _bx + "," + _by;
+  } else {
+    mode = "mode" + (i % 2);
+  }
+  
+  output.println(outTime + "," + mouseX + "," + mouseY + "," + collisionNum + "," + mode);
 }
 
 public void Mouse(float mX, float mY){
@@ -178,7 +194,8 @@ class Bird {
         }
       }
     }
-    
+    _bx = birdX;
+    _by = birdY;
   }
 
   public void collision(){
@@ -187,17 +204,19 @@ class Bird {
     bY = birdY;
     mX = mouseX;
     mY = mouseY;
-    if (bX <= mX && mX <= bX + birdImage.width && bY <= mY && mY <= bY + birdImage.height){
-      if (i % 2 == 0) {
-        birdX = (int)random(0, width);
-        birdY = 0;
-      } else {
-        birdY = (int)random(0, height);
-        birdX = width;
+    if ((_sinMove % 2) == 0) {
+      if (bX <= mX && mX <= bX + birdImage.width && bY <= mY && mY <= bY + birdImage.height){
+        if (i % 2 == 0) {
+          birdX = (int)random(0, width);
+          birdY = 0;
+        } else {
+          birdY = (int)random(0, height);
+          birdX = width;
+        }
+        player2.play();
+        player2.rewind();  //\u518d\u751f\u304c\u7d42\u308f\u3063\u305f\u3089\u5dfb\u304d\u623b\u3057\u3066\u304a\u304f
+        collisionNum ++;
       }
-      player2.play();
-      player2.rewind();  //\u518d\u751f\u304c\u7d42\u308f\u3063\u305f\u3089\u5dfb\u304d\u623b\u3057\u3066\u304a\u304f
-      collisionNum ++;
     }
   }
 
@@ -205,12 +224,14 @@ class Bird {
     if ((_sinMove % 2) == 1 ) {
       x = t2*myScale;
       y = -A*sin(w*t2 + p2);
-      t2 += rad;    //\u6642\u9593\u3092\u9032\u3081\u308b
       birdX = (int)x;
       birdY = (int)y + height / 2;
       float gamen = width/4 * rad;
       if (t2 > gamen) {
         t2 = 0.0f;//\u753b\u9762\u306e\u7aef\u306b\u884c\u3063\u305f\u3089\u539f\u70b9\u306b\u623b\u308b
+      }
+      if (birdX <= mouseX && mouseX <= (birdX + birdImage.width) && birdY <= mouseY && mouseY <= (birdY + birdImage.height)) {
+        t2 += rad;    //\u6642\u9593\u3092\u9032\u3081\u308b
       }
     } else {
       t2 = 0.0f;
