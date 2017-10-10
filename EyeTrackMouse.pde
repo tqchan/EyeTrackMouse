@@ -99,7 +99,10 @@ void keyPressed(){
   if (key == ENTER) {
     exit();
   }
-  if (key == BACKSPACE) {
+  // if (key == BACKSPACE) {
+  //   _sinMove++;
+  // }
+  if (key == ' ') {
     _sinMove++;
   }
 }
@@ -114,13 +117,14 @@ class Bird {
 
   void setup() {
     birdImage = loadImage("data/bird.png");
+    birdImage.resize(0, height/10);
     birdPg = createGraphics(width/10, height/10);
     if (i % 2 == 0) {
       birdX = (int)random(0, width);
-      birdY = 0;
+      birdY = (int)random(0, height);
     } else {
       birdY = (int)random(0, height);
-      birdX = width;
+      birdX = (int)random(0, width);
     }
     birdPg.beginDraw();
     birdPg.image(birdImage, 0, 0);

@@ -5,28 +5,28 @@ import processing.opengl.*;
 
 import ddf.minim.*; 
 
-import javazoom.jl.converter.*; 
-import javazoom.jl.decoder.*; 
-import javazoom.jl.player.*; 
-import javazoom.jl.player.advanced.*; 
-import ddf.minim.javasound.*; 
-import ddf.minim.*; 
-import ddf.minim.analysis.*; 
-import ddf.minim.effects.*; 
-import ddf.minim.signals.*; 
-import ddf.minim.spi.*; 
-import ddf.minim.ugens.*; 
-import javazoom.spi.*; 
-import javazoom.spi.mpeg.sampled.convert.*; 
-import javazoom.spi.mpeg.sampled.file.*; 
-import javazoom.spi.mpeg.sampled.file.tag.*; 
-import org.tritonus.sampled.file.*; 
 import org.tritonus.share.*; 
 import org.tritonus.share.midi.*; 
 import org.tritonus.share.sampled.*; 
 import org.tritonus.share.sampled.convert.*; 
 import org.tritonus.share.sampled.file.*; 
 import org.tritonus.share.sampled.mixer.*; 
+import javazoom.spi.*; 
+import javazoom.spi.mpeg.sampled.convert.*; 
+import javazoom.spi.mpeg.sampled.file.*; 
+import javazoom.spi.mpeg.sampled.file.tag.*; 
+import javazoom.jl.converter.*; 
+import javazoom.jl.decoder.*; 
+import javazoom.jl.player.*; 
+import javazoom.jl.player.advanced.*; 
+import ddf.minim.*; 
+import ddf.minim.analysis.*; 
+import ddf.minim.effects.*; 
+import ddf.minim.signals.*; 
+import ddf.minim.spi.*; 
+import ddf.minim.ugens.*; 
+import ddf.minim.javasound.*; 
+import org.tritonus.sampled.file.*; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -120,8 +120,6 @@ public void draw() {
   textSize(30);
   text("\u5f97\u70b9\uff1a" + collisionNum, 10, 30);
   if ((_sinMove % 2) == 1) {
-    // Bird birdXY = new Bird();
-    // float bf = birdXY.point(mouseX, mouseY);
     mode = "sin_mode" + "," + _bx + "," + _by;
   } else {
     mode = "mode" + (i % 2);
@@ -142,7 +140,10 @@ public void keyPressed(){
   if (key == ENTER) {
     exit();
   }
-  if (key == BACKSPACE) {
+  // if (key == BACKSPACE) {
+  //   _sinMove++;
+  // }
+  if (key == ' ') {
     _sinMove++;
   }
 }
@@ -157,13 +158,14 @@ class Bird {
 
   public void setup() {
     birdImage = loadImage("data/bird.png");
+    birdImage.resize(0, height/10);
     birdPg = createGraphics(width/10, height/10);
     if (i % 2 == 0) {
       birdX = (int)random(0, width);
-      birdY = 0;
+      birdY = (int)random(0, height);
     } else {
       birdY = (int)random(0, height);
-      birdX = width;
+      birdX = (int)random(0, width);
     }
     birdPg.beginDraw();
     birdPg.image(birdImage, 0, 0);
