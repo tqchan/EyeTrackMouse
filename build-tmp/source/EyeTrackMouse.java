@@ -4,29 +4,30 @@ import processing.event.*;
 import processing.opengl.*; 
 
 import ddf.minim.*; 
+import java.util.Date; 
 
-import org.tritonus.share.*; 
-import org.tritonus.share.midi.*; 
-import org.tritonus.share.sampled.*; 
-import org.tritonus.share.sampled.convert.*; 
-import org.tritonus.share.sampled.file.*; 
-import org.tritonus.share.sampled.mixer.*; 
-import javazoom.spi.*; 
-import javazoom.spi.mpeg.sampled.convert.*; 
-import javazoom.spi.mpeg.sampled.file.*; 
-import javazoom.spi.mpeg.sampled.file.tag.*; 
 import javazoom.jl.converter.*; 
 import javazoom.jl.decoder.*; 
 import javazoom.jl.player.*; 
 import javazoom.jl.player.advanced.*; 
+import ddf.minim.javasound.*; 
 import ddf.minim.*; 
 import ddf.minim.analysis.*; 
 import ddf.minim.effects.*; 
 import ddf.minim.signals.*; 
 import ddf.minim.spi.*; 
 import ddf.minim.ugens.*; 
-import ddf.minim.javasound.*; 
+import javazoom.spi.*; 
+import javazoom.spi.mpeg.sampled.convert.*; 
+import javazoom.spi.mpeg.sampled.file.*; 
+import javazoom.spi.mpeg.sampled.file.tag.*; 
 import org.tritonus.sampled.file.*; 
+import org.tritonus.share.*; 
+import org.tritonus.share.midi.*; 
+import org.tritonus.share.sampled.*; 
+import org.tritonus.share.sampled.convert.*; 
+import org.tritonus.share.sampled.file.*; 
+import org.tritonus.share.sampled.mixer.*; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -40,6 +41,7 @@ import java.io.IOException;
 public class EyeTrackMouse extends PApplet {
 
   //minim\u30e9\u30a4\u30d6\u30e9\u30ea\u306e\u30a4\u30f3\u30dd\u30fc\u30c8
+
 
 float grid[][];
 PVector point;
@@ -69,6 +71,7 @@ AudioPlayer player2;
 PrintWriter output; //\u30d5\u30a1\u30a4\u30eb\u66f8\u304d\u51fa\u3057
 String mode; //\u30e2\u30fc\u30c9\u683c\u7d0d
 int _bx, _by;
+Date d;
 
 public void setup() {
   
@@ -97,17 +100,22 @@ public void setup() {
   player = minim.loadFile("bgm.mp3");  //mp3\u3092\u30ed\u30fc\u30c9\u3059\u308b
   player.play();  //\u518d\u751f
   player2 = minim.loadFile("atari.mp3");
-  String filename = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2);
+  String filename = "log/" + nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2);
   // \u65b0\u3057\u3044\u30d5\u30a1\u30a4\u30eb\u3092\u751f\u6210
   output = createWriter( filename + ".csv");
   output.println("unixtime,mouseX,mouseY,collision,mode");
 }
 
 public void draw() {
+  d = new Date();
   image(pg, 0, 0);
   noStroke();
   Mouse(mouseX,mouseY);
-  String outTime = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2) + millis();
+  // String outTime = nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2) + millis();
+  
+  // String outTime = String.valueOf(d.getTime());
+
+  long outTime = d.getTime();
   if ((_sinMove % 2) == 0) {
     for (int i = 0; i < bird.length; i++) {
       bird[i].draw();
