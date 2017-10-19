@@ -72,6 +72,8 @@ PrintWriter output; //\u30d5\u30a1\u30a4\u30eb\u66f8\u304d\u51fa\u3057
 String mode; //\u30e2\u30fc\u30c9\u683c\u7d0d
 int _bx, _by;
 Date d;
+boolean examination = false;
+int examinationNo = 0;
 
 public void setup() {
   
@@ -100,7 +102,7 @@ public void setup() {
   player = minim.loadFile("bgm.mp3");  //mp3\u3092\u30ed\u30fc\u30c9\u3059\u308b
   player.play();  //\u518d\u751f
   player2 = minim.loadFile("atari.mp3");
-  String filename = "log/" + nf(year(),4) + nf(month(),2) + nf(day(),2) + nf(hour(),2) + nf(minute(),2) + nf(second(),2);
+  String filename = "log/" + nf(year(),4) + "_" + nf(month(),2) + "_" + nf(day(),2) + "_" + nf(hour(),2) + "_" + nf(minute(),2) + "_" + nf(second(),2);
   // \u65b0\u3057\u3044\u30d5\u30a1\u30a4\u30eb\u3092\u751f\u6210
   output = createWriter( filename + ".csv");
   output.println("unixtime,mouseX,mouseY,collision,mode");
@@ -132,8 +134,9 @@ public void draw() {
   } else {
     mode = "mode" + (i % 2);
   }
-  
-  output.println(outTime + "," + mouseX + "," + mouseY + "," + collisionNum + "," + mode);
+  if (examination) {
+    output.println(outTime + "," + mouseX + "," + mouseY + "," + collisionNum + "," + mode);
+  }
 }
 
 public void Mouse(float mX, float mY){
@@ -146,18 +149,31 @@ public void Mouse(float mX, float mY){
 
 public void keyPressed(){
   if (key == ENTER) {
+    output.flush();
+    output.close();
     exit();
   }
-  // if (key == BACKSPACE) {
-  //   _sinMove++;
-  // }
   if (key == ' ') {
-    _sinMove++;
+    // _sinMove++;
+    examinationNo++;
+    if ((examinationNo % 2) == 0) {
+      examination = false;
+      collisionNum = 0;
+    } else {
+      examination = true;
+    }
+    t2 = 0.0f;
+  }
+  if (key == '1') {
+    i++;
   }
 }
 
 public void mousePressed(){
-  i++;
+  // i++;
+  examination = false;
+  examinationNo = 0;
+  _sinMove++;
 }
 
 
@@ -225,7 +241,9 @@ class Bird {
         }
         player2.play();
         player2.rewind();  //\u518d\u751f\u304c\u7d42\u308f\u3063\u305f\u3089\u5dfb\u304d\u623b\u3057\u3066\u304a\u304f
-        collisionNum ++;
+        if (examination) {
+          collisionNum ++;
+        }
       }
     }
   }
